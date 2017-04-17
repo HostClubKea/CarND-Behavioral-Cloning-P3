@@ -47,6 +47,24 @@ controller = SimplePIController(0.1, 0.002)
 set_speed = 9
 controller.set_desired(set_speed)
 
+from skimage import transform
+import cv2
+import scipy
+
+def preprocess(image, top_offset=.375, bottom_offset=.125):
+    """
+    Applies preprocessing pipeline to an image: crops `top_offset` and `bottom_offset`
+    portions of image, resizes to 32x128 px and scales pixel values to [0, 1].
+    """
+    top = int(top_offset * image.shape[0])
+    bottom = int(bottom_offset * image.shape[0])
+
+    image = transform.resize(image[top:-bottom, :], (32, 128, 3))
+    image = scipy.misc.imresize(image, (64, 64))
+
+    return image
+
+
 
 @sio.on('telemetry')
 def telemetry(sid, data):
@@ -60,12 +78,14 @@ def telemetry(sid, data):
         # The current image from the center camera of the car
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
-        image_array = np.asarray(image)
+        image_array = preprocess(np.asarray(image))
         steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
 
         throttle = controller.update(float(speed))
-
-        print(steering_angle, throttle)
+        # max_angle = 1.
+        # throttle = 1.0 - 0.8/max_angle*min(max_angle, abs(10.*steering_angle))
+        # throttle = .2 if float(speed) > 10 else 1.
+        print(steering_angle, throttle, speed)
         send_control(steering_angle, throttle)
 
         # save frame
