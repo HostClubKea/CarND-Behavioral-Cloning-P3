@@ -20,7 +20,7 @@
 I've started with nvidia architecture, as it proof to fit well for the task. Later I used more simple version based on my previous project (3 convolutional layers and 3 flatout layers) and while it worked well on track one, I switch back to Nvidia architecture in attempts to generalize network to work on second unseen track. 
 
 
-As I havily used dataset augmentation and dropouts from the beginning so my training validation loss was always bigger then validation loss, and this difference was even bigger on simpler model which was also the reason to go back to Nvidia model. 
+As I havily used dataset augmentation and dropouts from the beginning my training validation loss was always bigger then validation loss, and this difference was even bigger on simpler model which was also the reason to go back to Nvidia model. 
 
 As I noticed in previous project playing with models many different architecture can give you almost same result, and more difference gives you amount of training data. So in this project I concentrated more on data augmentation and not on searching best network architecture. Also I notice that bad data can harm your model, so I was recording my data by small chuncks and test their combinations. For example I recorded extrim recovery actions, when car is perpendicular the road and try to return to the center, whyle this data helped a little bit with track2 it gave some unpredictable results on track1 so I ended up not using this one. 
 
@@ -121,8 +121,9 @@ Previous project have showed me that big and balanced dataset is very import to 
 
 ![alt text][image1]
 
-Then I recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle which helped my model to recover if it miss center at some point. That helped model 
- I ended up with 24582 samples (each contains 3 images). But distribution wasn't very nice, 0 steering was dominating
+Then I recorded the vehicle recovering from the left side and right sides of the road back to center which helped my model to recover if vehicle miss center at some point. That helped model to drive through track 1 without leaving the road.
+
+I ended up with 24582 samples (each contains 3 images). But distribution wasn't very nice, 0 angle steering was dominating
 
 ![alt text][image2]
 
@@ -168,7 +169,7 @@ I used this training data for training the model. The validation set helped dete
 
 ####4. Optimization
 
-Training speed is very important for successfull finish of the project. So at the beginning I was looking for increasing speed of training. I didn't want to pregenerate augmented data as I changed algorithms of augmentation and data I used for training network, but augmentation took quite a lot of time - 1 sec for a batch and about 90 sec for epoch. To increase speed of generating augmented samples I've used **multiprocessing**, it decreased time needed to augment samples for epoch from to 35 sec, batch to 0.4 sec.
+Training speed is very important for successfull finish of the project. So at the beginning I was looking for increasing speed of training. I didn't want to pregenerate augmented data as I changed algorithms of augmentation and data I used for training network, but augmentation took quite a lot of time - 1 sec for a batch and about 90 sec for epoch. To increase speed of generating augmented samples I've used **multiprocessing**, it decreased time needed to augment samples for epoch to 35 sec, batch to 0.4 sec.
 
 ```
 with Pool(3) as p:
@@ -178,6 +179,6 @@ with Pool(3) as p:
 
 ####5. Results
 
-After training on data from first track model can drive on first track and old second track. (see video.mp4 and video2old.mp4) 
+After training on data from first track model can drive on first track and old second track. (see video.mp4 and video2.mp4) 
 
 I wasn't able to make car drive on new second track based only on first track data, the best result I had is passing about 6 first turns and then car stuck. 
